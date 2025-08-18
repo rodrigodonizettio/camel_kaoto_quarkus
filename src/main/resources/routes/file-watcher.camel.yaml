@@ -1,0 +1,18 @@
+- beans:
+    - name: dateProcessor
+      type: com.rodrigodonizettio.camel.kaoto.DateProcessor
+- route:
+    id: route-file-watcher2
+    from:
+      id: from-3260
+      description: file-path-watcher
+      uri: file-watch
+      parameters:
+        path: my/desired/monitoring/path
+      steps:
+        - bean:
+            id: bean-3261
+            ref: dateProcessor
+        - log:
+            message: Detected ${header.CamelFileEventType} on file '${header.CamelFileName}'
+              at ${header.CamelFileLastModified}

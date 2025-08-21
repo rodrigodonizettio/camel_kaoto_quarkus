@@ -1,14 +1,14 @@
 - beans:
     - name: dateProcessor
-      type: com.rodrigodonizettio.camel.kaoto.DateProcessor
+      type: com.rodrigodonizettio.camel.beans.DateProcessor
 - route:
-    id: route-file-watcher2
+    id: route-file-watcher
     from:
       id: from-3260
       description: file-path-watcher
       uri: file-watch
       parameters:
-        path: my/desired/monitoring/path
+        path: /home/rodrigo-ubuntu24/Documents/Projects/ApacheCamel/CamelCore/MyCamel/file-mover/tmp/kaoto
       steps:
         - bean:
             id: bean-3261

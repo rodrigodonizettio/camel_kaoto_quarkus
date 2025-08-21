@@ -1,4 +1,4 @@
-package com.rodrigodonizettio.camel.kaoto;
+package com.rodrigodonizettio.camel.beans;
 
 
 import org.apache.camel.Exchange;

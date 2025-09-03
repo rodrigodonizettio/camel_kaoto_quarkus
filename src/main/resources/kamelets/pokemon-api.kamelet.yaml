@@ -1,0 +1,93 @@
+apiVersion: camel.apache.org/v1
+kind: Kamelet
+metadata:
+  annotations: {}
+  labels:
+    camel.apache.org/kamelet.type: source
+  name: pokemon-api
+spec:
+  definition:
+    description: Produces periodic HTTP events with a pokemon name to get their abilities
+    properties:
+      message:
+        description: The message to generate
+        title: Message
+        type: string
+      period:
+        default: 60000
+        description: The time interval between two events
+        title: Period
+        type: integer
+      pokemonName:
+        default: ditto
+        description: The name of the pokemon to fetch data for
+        title: Pokemon Name
+        type: string
+    required:
+      - message
+      - pokemonName
+    title: Get Pokemon Data API Kamelet
+  dependencies:
+    - camel:timer
+    - camel:http
+    - camel:kamelet
+    - camel:gson
+  template:
+    beans:
+      - name: pokemonMovesJoin
+        type: com.rodrigodonizettio.camel.beans.PokemonMovesJoin
+    from:
+      steps:
+        - to:
+            id: to-2515
+            parameters:
+              httpUri: https://pokeapi.co/api/v2/pokemon/{{pokemonName}}
+            uri: https
+        - unmarshal:
+            id: unmarshal-1954
+            json:
+              library: Gson
+        - setBody:
+            simple: "${body['moves']}"
+        # - log:
+        #     message: "Item no setBody#1: ${body}" # At this point the body contains a complete Moves List with all the undesired attributes
+        #     loggingLevel: INFO
+        - split:
+            id: split-1956
+            simple: "${body}"
+        # - log:
+        #     message: "Split body: ${body}"
+        #     loggingLevel: INFO
+        - setBody:
+            id: setBody-1957
+            simple: "${body['move']['name']}"
+        # - log:
+        #     message: "Item no setBody#2: ${body}" # At this point we have only the moves names but a single move name for each iteration e.g. Item no setBody#2: mega-punch \r\n Item no setBody#2: pay-day, ...
+        #     loggingLevel: INFO
+        - aggregate:
+            id: aggregate-1958
+            aggregationStrategy: "#class:org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy"
+            completionTimeout: 5000
+            correlationExpression:
+              constant: true
+        # - log:
+        #     message: "Cheguei depois do bean. Body: ${body}"
+        #     loggingLevel: INFO
+        - setHeader:
+            name: pokemonName
+            simple: "{{pokemonName}}"
+        - bean:
+            ref: pokemonMovesJoin
+            method: join
+        # - log:
+        #     message: "Item após transform: ${body}" # At this point we have the final desired output e.g. Item no transform: Pokemon 'pikachu' moves: mega-punch, pay-day, thunder-punch, slam, mega-kick, headbutt, tackle, body-slam, take-down, double-edge, growl, surf, thunder-shock, thunderbolt, thunder, quick-attack, rage, mimic, double-team, defense-curl, light-screen, reflect, bide, swift, skull-bash, rest, substitute, thief, snore, curse, protect, mud-slap, zap-cannon, detect, endure, charm, mud-sport, ice-ball, sleeptalk, return, frustration, iron-tail, hidden-power, rain-dance, sunny-day, facade, helping-hand, brick-break
+        #     loggingLevel: INFO
+        - to: kamelet:sink
+      parameters:
+        fixedRate: true
+        period: "{{period}}"
+        timerName: tick
+      uri: timer
+  types:
+    out:
+      mediaType: text/plain

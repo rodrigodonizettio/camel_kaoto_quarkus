@@ -1,0 +1,12 @@
+- route:
+    id: pokemon-route
+    from:
+      uri: kamelet:pokemon-api
+      parameters:
+        message: "Searching Pokemon data..."
+        period: 60000
+        pokemonName: "{{env:POKEMON_NAME}}" # e.g. export POKEMON_NAME=pikachu
+      steps:
+        - log:
+            message: "Pokemon Kamelet - API Response: ${body}"
+            loggingLevel: INFO

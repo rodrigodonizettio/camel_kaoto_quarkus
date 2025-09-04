@@ -2,6 +2,28 @@
 
 Project to experiment the usage of [Apache Camel](https://camel.apache.org/) and [Kaoto](https://camel.apache.org/categories/Kaoto/) while using them combined with [Quarkus](https://quarkus.io/).
 
+## Code Experiments
+
+### Camel Routes using Java
+
+- ```src/main/java/com/rodrigodonizettio/camel/*.java```
+
+### Camel Routes using YAML
+
+- ```src/main/resources/routes/*.yaml```
+
+### Camel Kamelets using YAML
+
+- ```src/main/resources/kamelets/*.yaml```
+
+### Java Beans
+
+- ```src/main/java/com/rodrigodonizettio/camel/beans/*.java```
+
+<br /><br />
+
+---
+
 ## Running the application in dev mode
 
 You can run your application in dev mode that enables live coding using:
